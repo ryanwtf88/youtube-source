@@ -66,7 +66,7 @@ public class YoutubeAudioSourceManager implements AudioSourceManager {
     private static final Pattern directVideoIdPattern = Pattern.compile("^" + VIDEO_ID_REGEX + "$");
     private static final Pattern directPlaylistIdPattern = Pattern.compile("^" + PLAYLIST_ID_REGEX + "$");
     private static final Pattern mainDomainPattern = Pattern.compile("^" + PROTOCOL_REGEX + DOMAIN_REGEX + "/.*");
-    private static final Pattern shortHandPattern = Pattern.compile("^" + PROTOCOL_REGEX + "(?:" + DOMAIN_REGEX + "/(?:live|embed|shorts)|" + SHORT_DOMAIN_REGEX + ")/(?<videoId>.*)");
+    private static final Pattern shortHandPattern = Pattern.compile("^" + PROTOCOL_REGEX + "(?:" + DOMAIN_REGEX + "/(?:live|embed|shorts)|" + SHORT_DOMAIN_REGEX + ")/(?<videoId>[a-zA-Z0-9_-]{11})");
 
     protected final HttpInterfaceManager httpInterfaceManager;
 
@@ -357,7 +357,8 @@ public class YoutubeAudioSourceManager implements AudioSourceManager {
     protected Router routeFromVideoId(@NotNull HttpInterface httpInterface,
                                       @NotNull String videoId,
                                       @Nullable UrlInfo urlInfo) {
-        String trimmedId = videoId.length() > 11 ? videoId.substring(0, 11) : videoId;
+        if (videoId.isEmpty()) return Router.none;
+        String trimmedId = videoId;
 
         if (!directVideoIdPattern.matcher(trimmedId).matches()) {
             return Router.none;
